@@ -23,7 +23,7 @@ type GameDetails = {
   rating: number;
   genres: { name: string }[];
   platforms: Platform[];
-  description_raw: string; // descrição em inglês
+  description_raw: string;
   developers: Creator[];
 };
 
