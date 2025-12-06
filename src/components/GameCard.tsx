@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Image, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Text } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -18,9 +18,10 @@ type Game = {
 type Props = {
   item: Game;
   onPress: () => void;
+  onAddPress: () => void;
 };
 
-export default function GameCard({ item, onPress }: Props) {
+export default function GameCard({ item, onPress, onAddPress }: Props) {
   const getPlatformIcon = (platform: string) => {
     const lower = platform.toLowerCase();
     if (lower.includes("windows") || lower.includes("pc")) return <FontAwesome5 name="windows" size={14} color="#fff" />;
@@ -52,7 +53,20 @@ export default function GameCard({ item, onPress }: Props) {
       {/* IMAGEM */}
       <View style={styles.imageWrapper}>
         <Image source={{ uri: item.background_image }} style={styles.image} />
-
+        {/* botao adicionar lista */}
+        <TouchableOpacity style={styles.addButton} 
+        onPress={() => {
+          Alert.alert(
+            "Adicionar Jogo",
+            `Deseja adicionar "${item.name}" à sua lista?`,
+            [
+              { text: "Cancelar", style: "cancel" },
+              { text: "Adicionar", onPress: onAddPress }
+            ]
+          );
+        }}>
+          <FontAwesome5 name="plus" size={16} color="#fff" />
+        </TouchableOpacity>
         {/* Overlay inferior com gradiente */}
         <LinearGradient colors={["transparent", "rgba(0,0,0,0.7)"]} style={styles.overlayBottom}>
           <Text style={styles.titleOverlay} numberOfLines={1}>
@@ -112,6 +126,17 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+  },
+  addButton: {
+  position: "absolute",
+  top: 8,
+  right: 8,
+  backgroundColor: "rgba(123, 70, 255, 0.8)",
+  padding: 6,
+  borderRadius: 20,
+  zIndex: 10,
+  alignItems: "center",
+  justifyContent: "center",
   },
   overlayBottom: {
     position: "absolute",

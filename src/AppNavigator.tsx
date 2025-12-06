@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/Home";
 import DetailsScreen from "./screens/Details";
+import ListScreen from "./screens/List";
 import { RootStackParamList } from "./navigation/types";
 import { enableFreeze, enableScreens } from "react-native-screens";
 
@@ -20,6 +21,7 @@ export default function AppNavigator() {
       >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="List" component={ListScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

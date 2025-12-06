@@ -7,6 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Platform = {
   platform: { name: string };
@@ -66,6 +67,25 @@ export default function DetailsScreen({ route, navigation }: DetailsScreenProps)
     return null;
   };
 
+  const addToList = async () => {
+    if (!details) return;
+    try {
+      const stored = await AsyncStorage.getItem("@my_game_list");
+      const currentList = stored ? JSON.parse(stored) : [];
+      const alreadyAdded = currentList.some((g: any) => g.name === details.name);
+
+      if (!alreadyAdded) {
+        const newList = [...currentList, details];
+        await AsyncStorage.setItem("@my_game_list", JSON.stringify(newList));
+        alert(`${details.name} adicionado à lista!`);
+      } else {
+        alert(`${details.name} já está na lista.`);
+      }
+    } catch (e) {
+      console.warn("Erro ao adicionar à lista:", e);
+    }
+  };
+
   if (loading || !details) {
     return (
       <SafeAreaView style={styles.loaderBox}>
@@ -112,6 +132,22 @@ export default function DetailsScreen({ route, navigation }: DetailsScreenProps)
             </Text>
           </LinearGradient>
         </View>
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            backgroundColor: "rgba(123, 70, 255, 0.8)",
+            padding: 8,
+            borderRadius: 20,
+            zIndex: 10,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onPress={addToList}
+        >
+          <FontAwesome5 name="plus-circle" size={20} color="#fff" />
+        </TouchableOpacity>
 
         {/* INFORMAÇÕES */}
         <View style={styles.info}>

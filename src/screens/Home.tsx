@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet, StatusBar, TouchableOpacity } from "react-native";
+import { View, FlatList, StyleSheet, StatusBar, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, ActivityIndicator, Searchbar } from "react-native-paper";
 import GameCard from "../components/GameCard";
 import { HomeScreenProps } from "../navigation/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 const API_KEY = "14623032330347328ccac22aded6c2fd";
 
@@ -52,6 +54,23 @@ export default function Home({ navigation }: HomeScreenProps) {
       </TouchableOpacity>
     );
   };
+  const addToList = async (game: any) => {
+  try {
+    const stored = await AsyncStorage.getItem("@my_game_list");
+    const currentList = stored ? JSON.parse(stored) : [];
+    const alreadyAdded = currentList.some((g: any) => g.id === game.id);
+    if (!alreadyAdded) {
+      const newList = [...currentList, game];
+      await AsyncStorage.setItem("@my_game_list", JSON.stringify(newList));
+      console.log(`${game.name} adicionado à lista!`);
+      Alert.alert(`"${game.name}" foi adicionado à sua lista.`); 
+    } else {
+      Alert.alert(`"${game.name}" já está na sua lista.`); 
+    }
+  } catch (e) {
+    console.log("Erro ao adicionar à lista:", e);
+  }
+};
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -91,11 +110,32 @@ export default function Home({ navigation }: HomeScreenProps) {
               onPress={() =>
                 navigation.navigate("Details", { gameId: item.id })
               }
+              onAddPress={() => addToList(item)
+              }
             />
           )}
           ListFooterComponent={renderFooter}
         />
       )}
+{/* FOOTER NAVIGATION */}
+<View style={styles.footerNav}>
+  <TouchableOpacity
+    style={styles.navButton}
+    onPress={() => navigation.navigate("Home")}
+  >
+    <FontAwesome5 name="home" size={20} color="#fff" />
+    <Text style={styles.navText}>Home</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.navButton}
+    onPress={() => navigation.navigate("List")}
+  >
+    <FontAwesome5 name="list" size={20} color="#fff" />
+    <Text style={styles.navText}>Lista</Text>
+  </TouchableOpacity>
+</View>
+
     </SafeAreaView>
   );
 }
@@ -144,5 +184,27 @@ const styles = StyleSheet.create({
     color: "#e5e7ebb8",
     fontWeight: "300",
     fontSize: 12,
+  },
+  footerNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#1e1e1e",
+    borderTopWidth: 0.5,
+    borderTopColor: "#333",
+  },
+  navButton: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  navText: {
+    color: "#fff",
+    fontSize: 12,
+    marginTop: 4,
   },
 });
